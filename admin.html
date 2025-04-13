@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AltGPT - Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="membership-container">
+        <h2>Membership Management</h2>
+        <p class="subtitle">Generate and manage student accounts</p>
+
+        <div class="admin-controls">
+            <div class="generate-section">
+                <h3>Generate New Accounts</h3>
+                <div class="form-group">
+                    <label for="accountCount">Number of accounts to generate:</label>
+                    <input type="number" id="accountCount" class="login-input" min="1" max="100" value="1">
+                </div>
+                <div class="form-group">
+                    <label for="duration">Membership Duration (months):</label>
+                    <input type="number" id="duration" class="login-input" min="1" max="12" value="1">
+                </div>
+                <button id="generateButton" class="generate-button">Generate Accounts</button>
+            </div>
+
+            <div class="accounts-section">
+                <h3>Generated Accounts</h3>
+                <div class="accounts-list" id="accountsList">
+                    <!-- Accounts will be listed here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <h3>Usage Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>Total Accounts</h4>
+                    <p class="stat-number" id="totalAccounts">0</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Active Accounts</h4>
+                    <p class="stat-number" id="activeAccounts">0</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Expired Accounts</h4>
+                    <p class="stat-number" id="expiredAccounts">0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/credentials.js"></script>
+    <script>
+        // Sample data structure for accounts
+        let accounts = [];
+
+        document.getElementById('generateButton').addEventListener('click', function() {
+            const count = parseInt(document.getElementById('accountCount').value);
+            const duration = parseInt(document.getElementById('duration').value);
+            
+            // Generate new accounts
+            for (let i = 0; i < count; i++) {
+                const username = generateUsername();
+                const password = generatePassword();
+                const expiryDate = new Date();
+                expiryDate.setMonth(expiryDate.getMonth() + duration);
+                
+                accounts.push({
+                    username,
+                    password,
+                    expiryDate,
+                    isActive: true
+                });
+            }
+            
+            updateAccountsList();
+            updateStats();
+        });
+
+        function generateUsername() {
+            return 'student_' + Math.random().toString(36).substr(2, 8);
+        }
+
+        function generatePassword() {
+            return Math.random().toString(36).substr(2, 10);
+        }
+
+        function updateAccountsList() {
+            const accountsList = document.getElementById('accountsList');
+            accountsList.innerHTML = '';
+            
+            accounts.forEach(account => {
+                const accountCard = document.createElement('div');
+                accountCard.className = 'membership-card';
+                accountCard.innerHTML = `
+                    <h4>${account.username}</h4>
+                    <p>Password: ${account.password}</p>
+                    <p>Expires: ${account.expiryDate.toLocaleDateString()}</p>
+                    <p>Status: ${account.isActive ? 'Active' : 'Expired'}</p>
+                `;
+                accountsList.appendChild(accountCard);
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('totalAccounts').textContent = accounts.length;
+            document.getElementById('activeAccounts').textContent = accounts.filter(a => a.isActive).length;
+            document.getElementById('expiredAccounts').textContent = accounts.filter(a => !a.isActive).length;
+        }
+    </script>
+</body>
+</html> 

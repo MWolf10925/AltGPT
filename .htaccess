@@ -1,0 +1,22 @@
+# Force HTTPS
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Redirect www to non-www
+RewriteCond %{HTTP_HOST} ^www\.altgpt\.infy\.uk [NC]
+RewriteRule ^(.*)$ https://altgpt.infy.uk/$1 [L,R=301]
+
+# Prevent directory listing
+Options -Indexes
+
+# Protect sensitive files
+<FilesMatch "^(credentials\.js|\.htaccess)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Enable CORS for your domain
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "https://altgpt.infy.uk"
+</IfModule> 

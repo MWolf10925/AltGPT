@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AltGPT - Your Friendly AI Helper</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <script>
+        // Check if user is logged in
+        if (!localStorage.getItem('currentUser')) {
+            window.location.href = 'index.html';
+        }
+    </script>
+    <div class="profile-icon">
+        <i class="fas fa-user"></i>
+        <div class="profile-menu">
+            <div class="profile-menu-item" onclick="showProfile()">
+                <i class="fas fa-user-circle"></i>
+                <span>Profile</span>
+            </div>
+            <div class="profile-menu-item" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container mx-auto px-4 py-8">
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-center text-blue-400">AltGPT</h1>
+            <p class="text-center text-gray-400 mt-2">Your friendly AI helper for stuff</p>
+        </header>
+
+        <main class="max-w-6xl mx-auto">
+            <!-- Chat Interface -->
+            <div class="chat-container">
+                <div id="chat-messages" class="overflow-y-auto">
+                    <!-- Chat messages will appear here -->
+                </div>
+                <div class="flex gap-2 p-4">
+                    <input type="text" id="user-input" 
+                           class="flex-1 bg-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="Ask me anything...">
+                    <label for="file-upload" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer flex items-center">
+                        <i class="fas fa-file-upload mr-2"></i>
+                        <input type="file" id="file-upload" class="hidden" accept=".pdf,.doc,.docx,.txt">
+                    </label>
+                    <button id="send-button" 
+                            class="bg-blue-500 hover:bg-blue-600 px-6 py-2 rounded-lg font-medium transition-colors">
+                        Send
+                    </button>
+                </div>
+                <div id="file-preview" class="hidden p-2 bg-gray-800 rounded-lg m-2">
+                    <div class="flex items-center justify-between">
+                        <span id="file-name" class="text-sm text-gray-300"></span>
+                        <button onclick="removeFile()" class="text-red-500 hover:text-red-400">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <button id="search-button" 
+                        class="bg-gray-800 hover:bg-gray-700 p-4 rounded-lg flex items-center justify-center gap-2 transition-all hover:scale-105">
+                    <span>🔍</span> Quick Search
+                </button>
+                <button id="cite-button" 
+                        class="bg-gray-800 hover:bg-gray-700 p-4 rounded-lg flex items-center justify-center gap-2 transition-all hover:scale-105">
+                    <span>📚</span> Get Citations
+                </button>
+                <button id="study-button" 
+                        class="bg-gray-800 hover:bg-gray-700 p-4 rounded-lg flex items-center justify-center gap-2 transition-all hover:scale-105">
+                    <span>📝</span> Study Help
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profile-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Profile</h2>
+            <div class="profile-info">
+                <p>Username: <span id="profile-username"></span></p>
+                <p>Account Type: Student</p>
+                <p>Member Since: <span id="member-since"></span></p>
+            </div>
+            <button onclick="closeModal('profile-modal')" class="close-button">Close</button>
+        </div>
+    </div>
+
+    <script src="/script.js"></script>
+    <script>
+        // Profile menu functionality
+        function showProfile() {
+            const username = localStorage.getItem('currentUser') || 'Guest';
+            document.getElementById('profile-username').textContent = username;
+            document.getElementById('member-since').textContent = new Date().toLocaleDateString();
+            document.getElementById('profile-modal').classList.remove('hidden');
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.add('hidden');
+            }
+        }
+
+        // File upload handling
+        let currentFile = null;
+
+        document.getElementById('file-upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const fileType = file.type;
+                const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+                
+                if (!validTypes.includes(fileType)) {
+                    alert('Please upload a PDF, Word document, or text file.');
+                    this.value = '';
+                    return;
+                }
+
+                currentFile = file;
+                document.getElementById('file-name').textContent = file.name;
+                document.getElementById('file-preview').classList.remove('hidden');
+            }
+        });
+
+        function removeFile() {
+            currentFile = null;
+            document.getElementById('file-upload').value = '';
+            document.getElementById('file-preview').classList.add('hidden');
+        }
+
+        // Modify the send button click handler to include file information
+        document.getElementById('send-button').addEventListener('click', function() {
+            const input = document.getElementById('user-input');
+            const message = input.value.trim();
+            
+            if (message || currentFile) {
+                let fullMessage = message;
+                if (currentFile) {
+                    fullMessage += ` [File: ${currentFile.name}]`;
+                }
+                
+                // Add the message to the chat
+                addMessage(fullMessage, 'user');
+                
+                // Clear the input and file
+                input.value = '';
+                removeFile();
+                
+                // Process the message (you can add your AI response logic here)
+                setTimeout(() => {
+                    addMessage("I've received your file. How can I help you with it?", 'assistant');
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html> 

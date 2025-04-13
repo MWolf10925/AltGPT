@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AltGPT - Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-center text-blue-400">AltGPT</h1>
+            <p class="text-center text-gray-400 mt-2">Your friendly AI helper for stuff</p>
+        </header>
+
+        <main class="max-w-md mx-auto">
+            <div class="login-container">
+                <form id="login-form" class="login-form">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" class="login-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" class="login-input" required>
+                    </div>
+                    <div class="terms-container">
+                        <h3>Terms and Conditions</h3>
+                        <p>By logging in, you agree to:</p>
+                        <ul>
+                            <li>Use the service responsibly</li>
+                            <li>Not share your account credentials</li>
+                            <li>Follow all applicable laws and regulations</li>
+                        </ul>
+                    </div>
+                    <div class="terms-checkbox">
+                        <input type="checkbox" id="terms" required>
+                        <label for="terms">I agree to the terms and conditions</label>
+                    </div>
+                    <button type="submit" class="login-button">Login</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="/credentials.js"></script>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (credentialsManager.validateLogin(username, password)) {
+                localStorage.setItem('currentUser', username);
+                window.location.href = 'chat.html';
+            } else {
+                alert('Invalid username or password');
+            }
+        });
+    </script>
+</body>
+</html> 
