@@ -112,6 +112,16 @@
             document.getElementById('activeAccounts').textContent = accounts.filter(a => a.isActive).length;
             document.getElementById('expiredAccounts').textContent = accounts.filter(a => !a.isActive).length;
         }
+
+        // Check if user is logged in
+        if (!localStorage.getItem('currentUser')) {
+            window.location.href = 'https://altgpt.space';
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'https://altgpt.space';
+        }
     </script>
 </body>
 </html> 
